@@ -1,7 +1,7 @@
 # Juppiter ![workflow status](https://github.com/CloudNetService/juppiter/actions/workflows/build.yml/badge.svg)
 
 **juppiter** is a simple Gradle plugin for CloudNet 3 which automatically generates the module.json file for your
-cloudnet module. Properties can automatically get detected as well as being specified in the build.gradle of your module
+CloudNet module. Properties can automatically get detected as well as being specified in the build.gradle of your module
 project.
 
 ## Usage
@@ -87,7 +87,7 @@ moduleJson {
       url = 'https://cloudnetservice.eu/cloudnet/updates/versions/3.4.0-RELEASE/cloudnet-rest.jar'
     }
     // This case demonstrates how to depend on gson without putting it into the
-    // dependenvy handler block of your build.gradle (See below for more information
+    // dependency handler block of your build.gradle (See below for more information
     // on this). Please note that for this example to work a repository with the
     // name 'Maven-Central' has to be added to the project. If the repository is
     // not defined the node will just silently ignore the dependency. If the
