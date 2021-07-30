@@ -20,12 +20,8 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer
-import com.fasterxml.jackson.databind.util.StdConverter
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.gradle.api.DefaultTask
-import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -51,21 +47,9 @@ open class GenerateModuleJson : DefaultTask() {
       .enable(JsonGenerator.Feature.IGNORE_UNKNOWN)
       .enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION)
 
-    val module = SimpleModule()
-    module.addSerializer(
-      StdDelegatingSerializer(clazz<NamedDomainObjectCollection<Any>>(), NamedDomainObjectCollectionConverter)
-    )
-
     val mapper = ObjectMapper(factory)
       .registerKotlinModule()
-      .registerModule(module)
       .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
     mapper.writeValue(outputDirectory.file(fileName).get().asFile, moduleConfiguration.get())
   }
-
-  object NamedDomainObjectCollectionConverter : StdConverter<NamedDomainObjectCollection<Any>, Collection<Any>>() {
-    override fun convert(value: NamedDomainObjectCollection<Any>): Collection<Any> = value
-  }
-
-  private inline fun <reified T> clazz(): Class<T> = T::class.java
 }

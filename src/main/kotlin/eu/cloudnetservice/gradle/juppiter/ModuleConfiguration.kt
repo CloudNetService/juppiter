@@ -16,6 +16,7 @@
 
 package eu.cloudnetservice.gradle.juppiter
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import eu.cloudnetservice.gradle.juppiter.util.MavenUtility
 import groovy.lang.Closure
 import org.gradle.api.NamedDomainObjectContainer
@@ -62,9 +63,11 @@ open class ModuleConfiguration(project: Project) {
   var description: String? = null
 
   @Nested
+  @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = JsonTypeInfo.As.WRAPPER_OBJECT)
   val repositories: NamedDomainObjectContainer<Repository> = project.container(Repository::class.java)
 
   @Nested
+  @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = JsonTypeInfo.As.WRAPPER_OBJECT)
   val dependencies: NamedDomainObjectContainer<Dependency> = project.container(Dependency::class.java)
 
   // for groovy
