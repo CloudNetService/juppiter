@@ -137,7 +137,7 @@ repositories and adds all of them to the module.json file.
 ## Customize the generation task
 
 In the [Full configuration](#Full configuration) section the configuration of the module extension was explained. Below
-is a small description on how to modify the generation task. By default there is no need to configure any property of
+is a small description on how to modify the generation task. By default, there is no need to configure any property of
 the task settings.
 
 ```groovy
@@ -165,6 +165,6 @@ genModuleJson {
 
 If you need help using this plugin or found an issue feel free to join
 our [Discord Server](https://discord.cloudnetservice.eu/) or open
-an [issue](https://github.com/CloudNetService/juppiter/issues/new) on github.
+an [issue](https://github.com/CloudNetService/juppiter/issues/new) on GitHub.
 
 **Happy developing!**
