@@ -136,7 +136,7 @@ repositories and adds all of them to the module.json file.
 
 ## Customize the generation task
 
-In the [Full configuration](#Full configuration) section the configuration of the module extension was explained. Below
+In the [Full configuration](#full-configuration) section the configuration of the module extension was explained. Below
 is a small description on how to modify the generation task. By default, there is no need to configure any property of
 the task settings.
 
