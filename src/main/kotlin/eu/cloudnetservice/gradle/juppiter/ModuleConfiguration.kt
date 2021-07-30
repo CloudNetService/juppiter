@@ -22,12 +22,11 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 
-open class ModuleConfiguration(objects: ObjectFactory) {
+open class ModuleConfiguration(project: Project) {
 
   @Input
   var runtimeModule = false
@@ -63,18 +62,27 @@ open class ModuleConfiguration(objects: ObjectFactory) {
   var description: String? = null
 
   @Nested
-  val repositories: NamedDomainObjectContainer<Repository> = objects.domainObjectContainer(Repository::class.java)
+  val repositories: NamedDomainObjectContainer<Repository> = project.container(Repository::class.java)
 
   @Nested
-  val dependencies: NamedDomainObjectContainer<Dependency> = objects.domainObjectContainer(Dependency::class.java)
+  val dependencies: NamedDomainObjectContainer<Dependency> = project.container(Dependency::class.java)
 
   // for groovy
   fun repositories(closure: Closure<Unit>) = repositories.configure(closure)
   fun dependencies(closure: Closure<Unit>) = dependencies.configure(closure)
 
-  data class Repository(@Input val name: String, @Input val url: String)
+  data class Repository(@Input val name: String) {
+    @Input
+    var url: String? = null
+  }
 
-  data class Dependency(@Input val group: String, @Input val name: String, @Input val version: String) {
+  data class Dependency(@Input val name: String) {
+    @Input
+    var group: String? = null
+
+    @Input
+    var version: String? = null
+
     @Input
     @Optional
     var url: String? = null
@@ -97,15 +105,19 @@ open class ModuleConfiguration(objects: ObjectFactory) {
     val repos = project.repositories.filterIsInstance<MavenArtifactRepository>()
     libraries.resolvedConfiguration.resolvedArtifacts
       .map { it.moduleVersion.id }
-      .filter { it.group != project.group }
       .forEach {
         val repository = MavenUtility.resolveRepository(it, repos) ?: return@forEach
 
-        val dependency = Dependency(it.group, it.name, it.version)
+        val dependency = Dependency(it.name)
+        dependency.group = it.group
+        dependency.version = it.version
         dependency.repo = repository.name
 
+        val repo = Repository(repository.name)
+        repo.url = repository.url.toURL().toExternalForm()
+
+        repositories.add(repo)
         dependencies.add(dependency)
-        repositories.add(Repository(repository.name, repository.url.toURL().toExternalForm()))
       }
   }
 

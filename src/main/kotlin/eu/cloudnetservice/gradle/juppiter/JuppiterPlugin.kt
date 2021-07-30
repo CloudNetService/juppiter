@@ -33,7 +33,7 @@ class JuppiterPlugin : Plugin<Project> {
     target.run {
       val libraries = configurations.maybeCreate("moduleLibrary")
       val moduleExtension = GradleUtil.findOrAddExtension(extensions, "moduleJson", ModuleConfiguration::class) {
-        ModuleConfiguration(objects)
+        ModuleConfiguration(this)
       }
 
       val generateModuleTask = tasks.register<GenerateModuleJson>("genModuleJson") {
