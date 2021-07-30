@@ -10,7 +10,7 @@ Simply add the juppiter plugin to your build.gradle as follows:
 
 ```groovy
 plugins {
-  id 'eu.cloudnetservice.gradle.juppiter' version '1.0-SNAPSHOT'
+  id 'eu.cloudnetservice.gradle.juppiter' version '0.1.0-SNAPSHOT'
 }
 ```
 
