@@ -43,8 +43,8 @@ gradlePlugin {
   plugins {
     register("juppiter") {
       description = project.description
+      id = "eu.cloudnetservice.juppiter"
       displayName = "Juppiter Gradle Plugin"
-      id = "eu.cloudnetservice.gradle.juppiter"
       implementationClass = "eu.cloudnetservice.gradle.juppiter.JuppiterPlugin"
     }
   }
