@@ -58,6 +58,11 @@ moduleJson {
   // wiki page for this module. If not specified this setting defaults
   // to 'https://cloudnetservice.eu'
   website = 'https://cloudnetservice.eu'
+  // Specifies the data folder of this module. This will override the
+  // default data folder configuration of CloudNet which is based on the
+  // base path of the module provider and the name of the module. In this
+  // case it would be 'modules/CloudNet-Signs' for the default module provider.
+  dataFolder = 'modules/IWantMyCustomDataFolder'
   // Specified the description of this module. This defaults to the
   // project description and if the project description is not set
   // it will fall back to 'Just another CloudNet3 module'

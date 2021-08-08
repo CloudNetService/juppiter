@@ -60,6 +60,10 @@ open class ModuleConfiguration(project: Project) {
 
   @Input
   @Optional
+  var dataFolder: String? = null
+
+  @Input
+  @Optional
   var description: String? = null
 
   @Nested
