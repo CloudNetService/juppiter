@@ -75,6 +75,9 @@ open class ModuleConfiguration(project: Project) {
   var minJavaVersionId: JavaVersion? = null
 
   @Nested
+  val properties: Map<String, Any> = HashMap()
+
+  @Nested
   @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = JsonTypeInfo.As.WRAPPER_OBJECT)
   val repositories: NamedDomainObjectContainer<Repository> = project.container(Repository::class.java)
 

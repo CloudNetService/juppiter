@@ -74,6 +74,12 @@ moduleJson {
   // version does not support the provided java version, a warning will be printed
   // and the module will not get loaded.
   minJavaVersionId = JavaVersion.VERSION_11
+  // You can define custom properties for your module which will be accessible
+  // in the runtime in a seperated JsonDocument: ModuleConfiguration#getProperties.
+  // The properties object is a map, all keys must be a string the values can be
+  // anything you want (in this case a string and a boolean).
+  properties.put("Build-Number", System.getenv('BUILD_NUMBER').toString())
+  properties.put("Development-Build", project.version.endsWith('-SNAPSHOT'))
   // You can define custom dependencies which will get added to your
   // module.json. However any dependency in the dependency block
   // which uses the configuration 'moduleLibrary' will be resolved against
