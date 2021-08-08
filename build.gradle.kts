@@ -25,6 +25,10 @@ plugins {
 version = "0.1.0-SNAPSHOT"
 group = "eu.cloudnetservice.gradle"
 
+// we set the kotlin jmvTarget specifically to 1.8 to prevent issues in case the default values changes
+val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+compileKotlin.kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+
 repositories {
   gradlePluginPortal()
 }
