@@ -17,8 +17,11 @@
 package eu.cloudnetservice.gradle.juppiter
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import eu.cloudnetservice.gradle.juppiter.jackson.JavaVersionSerializer
 import eu.cloudnetservice.gradle.juppiter.util.MavenUtility
 import groovy.lang.Closure
+import org.gradle.api.JavaVersion
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -65,6 +68,11 @@ open class ModuleConfiguration(project: Project) {
   @Input
   @Optional
   var description: String? = null
+
+  @Input
+  @Optional
+  @JsonSerialize(using = JavaVersionSerializer::class, nullsUsing = JavaVersionSerializer::class)
+  var minJavaVersionId: JavaVersion? = null
 
   @Nested
   @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = JsonTypeInfo.As.WRAPPER_OBJECT)

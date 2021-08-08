@@ -10,7 +10,7 @@ Simply add the Juppiter plugin to your build.gradle as follows:
 
 ```groovy
 plugins {
-  id 'eu.cloudnetservice.gradle.juppiter' version '0.1.0-SNAPSHOT'
+  id 'eu.cloudnetservice.juppiter' version '0.1.0-SNAPSHOT'
 }
 ```
 
@@ -67,6 +67,13 @@ moduleJson {
   // project description and if the project description is not set
   // it will fall back to 'Just another CloudNet3 module'
   description = 'CloudNet extension which adds sign connector support for Bukkit, Nukkit and Sponge'
+  // Specifies the minimum java version required in the runtime in order to 
+  // run this module. If this property is not set it's assumed that the module
+  // can run on every version starting from java version 8. The same rule applies
+  // if the module defines a version which is older than version 8. If the runtime
+  // version does not support the provided java version, a warning will be printed
+  // and the module will not get loaded.
+  minJavaVersionId = JavaVersion.VERSION_11
   // You can define custom dependencies which will get added to your
   // module.json. However any dependency in the dependency block
   // which uses the configuration 'moduleLibrary' will be resolved against
