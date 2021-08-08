@@ -58,7 +58,7 @@ pluginBundle {
   description = project.description
   website = "https://cloudnetservice.eu"
   vcsUrl = "https://github.com/CloudNetService/juppiter"
-  tags = listOf("cloudnet", "cloudnet-modules", "module-generation")
+  tags = listOf("cloudnet", "cloudnet-module-util")
 }
 
 publishing {
