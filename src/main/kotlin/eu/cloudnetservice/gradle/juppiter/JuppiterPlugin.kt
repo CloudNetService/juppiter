@@ -32,6 +32,8 @@ class JuppiterPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     target.run {
       val libraries = configurations.maybeCreate("moduleLibrary")
+      val moduleDependencies = configurations.maybeCreate("moduleDependency")
+
       val moduleExtension = GradleUtil.findOrAddExtension(extensions, "moduleJson", ModuleConfiguration::class) {
         ModuleConfiguration(this)
       }
@@ -40,7 +42,7 @@ class JuppiterPlugin : Plugin<Project> {
         fileName.convention("module.json")
         outputDirectory.convention(layout.buildDirectory.dir("generated/module-json"))
         moduleConfiguration.convention(provider {
-          moduleExtension.setDefaults(this@run, libraries)
+          moduleExtension.setDefaults(this@run, libraries, moduleDependencies)
           moduleExtension
         })
 
@@ -52,7 +54,7 @@ class JuppiterPlugin : Plugin<Project> {
       plugins.withType<JavaPlugin> {
         extensions.getByType<SourceSetContainer>().named(SourceSet.MAIN_SOURCE_SET_NAME) {
           resources.srcDir(generateModuleTask)
-          configurations.getByName(compileClasspathConfigurationName).extendsFrom(libraries)
+          configurations.getByName(compileClasspathConfigurationName).extendsFrom(libraries, moduleDependencies)
         }
       }
     }

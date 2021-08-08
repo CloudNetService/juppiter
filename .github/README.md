@@ -74,9 +74,16 @@ moduleJson {
   // If the repository is not yet defined, it will be added automatically
   // to the build output. Below is an example how to add a custom dependencies.
   dependencies {
-    // This case demonstrates how to depend on the bridge module which now gets 
-    // loaded before this module. No repository is defined, so the module must
-    // be loaded already for this to work.
+    // This case demonstrates how to depend on the bridge module without putting it 
+    // into the dependency handler block of your build.gradle (See below for more 
+    // information on this). The bridge module now gets loaded before this module.
+    // No repository is defined, so the module must be loaded already for this to work.
+    // The module version which runs in the runtime must match the following convention:
+    //    - the major version must match exactly the defined version major
+    //    - the minor version must be higher or equal to the defined version minor
+    //    - the patch version is ignored as it should never contain breaking changes
+    // Note that this version checking only works for modules which follow the semantic
+    // versioning 2: https://semver.org/
     'CloudNet-Bridge' {
       version = '1.2'
       group = 'de.dytanic.cloudnet.modules'
@@ -85,7 +92,10 @@ moduleJson {
     // loaded before this module. The download url of the module is defined
     // so it will be loaded from there if the dependency is not yet available
     // on the local machine. The url property will always force the node
-    // by default to use this url, so defining a repo has no effect.
+    // by default to use this url, so defining a repo has no effect. Note
+    // that in this example the rest module is not dependency as a module
+    // but as a normal maven dependency (so the rest module will not get loaded
+    // before this module but downloaded and added to the module ucp).
     'CloudNet-Rest' {
       version = '1.0'
       group = 'de.dytanic.cloudnet.modules'
@@ -127,9 +137,18 @@ dependencies {
   // will be added to the fat jar by for example the shadow plugin
   implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.0'
   // these are only available during the compile and will be added to the
-  // module.json file
+  // module.json file and loaded in the runtime. These dependencies must be
+  // resolvable in a repository in order to work.
   moduleLibrary group: 'io.netty', name: 'netty-handler', version: '4.1.66.Final'
   moduleLibrary group: 'com.github.juliarn', name: 'npc-lib', version: 'development-SNAPSHOT'
+  // This defines a dependency on another module. These will not be associated with
+  // any repository during the build but must be present for the module provider in
+  // the runtime in order to work. There is no way that CloudNet loads module dependencies
+  // automatically. The classes of the module are available during the compile process
+  // and will not get shaded into the jar. See above for information about strict
+  // module version checking.
+  moduleDependency group: 'de.dytanic.cloudnet.modules', name: 'CloudNet-Bridge', version: '1.2'
+  moduleDependency group: 'eu.cloudnetservice.cloudnet.modules', name: 'CloudNet-Signs', version: '2.0'
   // other dependencies you may need
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'

@@ -99,7 +99,7 @@ open class ModuleConfiguration(project: Project) {
     var repo: String? = null
   }
 
-  fun setDefaults(project: Project, libraries: Configuration) {
+  fun setDefaults(project: Project, libraries: Configuration, moduleDependencies: Configuration) {
     name = name ?: project.name
     group = group ?: project.group.toString()
     version = version ?: project.version.toString()
@@ -109,6 +109,7 @@ open class ModuleConfiguration(project: Project) {
     website = website ?: "https://cloudnetservice.eu"
     description = description ?: project.description ?: "Just another CloudNet3 module"
 
+    // dependencies of the module we need to resolve
     val repos = project.repositories.filterIsInstance<MavenArtifactRepository>()
     libraries.resolvedConfiguration.resolvedArtifacts
       .map { it.moduleVersion.id }
@@ -124,6 +125,17 @@ open class ModuleConfiguration(project: Project) {
         repo.url = repository.url.toURL().toExternalForm()
 
         repositories.add(repo)
+        dependencies.add(dependency)
+      }
+
+    // dependencies of the module that are other modules, so we only need: group, name, version
+    moduleDependencies.resolvedConfiguration.resolvedArtifacts
+      .map { it.moduleVersion.id }
+      .forEach {
+        val dependency = Dependency(it.name)
+        dependency.group = it.group
+        dependency.version = it.version
+
         dependencies.add(dependency)
       }
   }
