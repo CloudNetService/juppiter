@@ -22,7 +22,7 @@ plugins {
   id("com.gradle.plugin-publish") version "0.15.0"
 }
 
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 group = "eu.cloudnetservice.gradle"
 
 // we set the kotlin jmvTarget specifically to 1.8 to prevent issues in case the default values changes
