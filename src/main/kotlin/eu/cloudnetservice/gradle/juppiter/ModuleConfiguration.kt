@@ -140,8 +140,8 @@ open class ModuleConfiguration(project: Project) {
       }
 
     // dependencies of the module that are other modules, so we only need: group, name, version
-    moduleDependencies.resolvedConfiguration.resolvedArtifacts
-      .map { it.moduleVersion.id }
+    moduleDependencies.resolvedConfiguration.firstLevelModuleDependencies
+      .map { it.module.id }
       .forEach {
         val dependency = Dependency(it.name)
         dependency.group = it.group
