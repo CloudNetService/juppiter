@@ -16,7 +16,7 @@
 
 package eu.cloudnetservice.gradle.juppiter.util
 
-import org.gradle.api.artifacts.ModuleVersionIdentifier
+import eu.cloudnetservice.gradle.juppiter.ModuleConfiguration
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import java.net.HttpURLConnection
 import java.net.URL
@@ -24,13 +24,13 @@ import java.net.URL
 object MavenUtility {
 
   fun resolveRepository(
-    id: ModuleVersionIdentifier,
+    dep: ModuleConfiguration.Dependency,
     repositories: Iterable<MavenArtifactRepository>
   ): MavenArtifactRepository? {
     return repositories.firstOrNull {
       val url = URL(
         it.url.toURL(),
-        "${id.group.replace('.', '/')}/${id.name}/${id.version}/${id.name}-${id.version}.jar"
+        "${dep.group!!.replace('.', '/')}/${dep.name}/${dep.version}/${dep.name}-${dep.version}.jar"
       )
       with(url.openConnection() as HttpURLConnection) {
         useCaches = false

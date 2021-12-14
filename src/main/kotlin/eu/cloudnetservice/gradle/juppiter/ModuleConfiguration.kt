@@ -16,9 +16,11 @@
 
 package eu.cloudnetservice.gradle.juppiter
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import eu.cloudnetservice.gradle.juppiter.jackson.JavaVersionSerializer
+import eu.cloudnetservice.gradle.juppiter.util.DependencyUtils
 import eu.cloudnetservice.gradle.juppiter.util.MavenUtility
 import groovy.lang.Closure
 import org.gradle.api.JavaVersion
@@ -108,6 +110,10 @@ open class ModuleConfiguration(project: Project) {
     @Input
     @Optional
     var repo: String? = null
+
+    @Input
+    @JsonIgnore
+    var needsRepoResolve: Boolean = true
   }
 
   fun setDefaults(project: Project, libraries: Configuration, moduleDependencies: Configuration) {
@@ -121,23 +127,9 @@ open class ModuleConfiguration(project: Project) {
     description = description ?: project.description ?: "Just another CloudNet3 module"
 
     // dependencies of the module we need to resolve
-    val repos = project.repositories.filterIsInstance<MavenArtifactRepository>()
-    libraries.resolvedConfiguration.resolvedArtifacts
-      .map { it.moduleVersion.id }
-      .forEach {
-        val repository = MavenUtility.resolveRepository(it, repos) ?: return@forEach
-
-        val dependency = Dependency(it.name)
-        dependency.group = it.group
-        dependency.version = it.version
-        dependency.repo = repository.name
-
-        val repo = Repository(repository.name)
-        repo.url = repository.url.toURL().toExternalForm()
-
-        repositories.add(repo)
-        dependencies.add(dependency)
-      }
+    libraries.resolvedConfiguration.resolvedArtifacts.forEach {
+      dependencies.add(DependencyUtils.convertToDependency(it, it.moduleVersion.id))
+    }
 
     // dependencies of the module that are other modules, so we only need: group, name, version
     moduleDependencies.resolvedConfiguration.firstLevelModuleDependencies
@@ -146,8 +138,26 @@ open class ModuleConfiguration(project: Project) {
         val dependency = Dependency(it.name)
         dependency.group = it.group
         dependency.version = it.version
+        dependency.needsRepoResolve = false
 
         dependencies.add(dependency)
+      }
+  }
+
+  fun resolveRepositories(project: Project) {
+    val repos = project.repositories.filterIsInstance<MavenArtifactRepository>()
+    // get the repos for the dependencies, throw an exception if we cannot resolve a dependency
+    dependencies
+      .filter { it.needsRepoResolve }
+      .forEach {
+        val repo = MavenUtility.resolveRepository(it, repos) ?: throw UnknownDependencyException(it)
+        // set the repository of the dependency
+        it.repo = repo.name
+        // convert the repo
+        val repository = Repository(repo.name)
+        repository.url = repo.url.toURL().toExternalForm()
+        // register the repo
+        repositories.add(repository)
       }
   }
 

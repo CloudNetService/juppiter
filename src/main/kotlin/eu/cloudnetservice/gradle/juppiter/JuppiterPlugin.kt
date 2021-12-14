@@ -26,7 +26,6 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 
-@ExperimentalStdlibApi
 class JuppiterPlugin : Plugin<Project> {
 
   override fun apply(target: Project) {

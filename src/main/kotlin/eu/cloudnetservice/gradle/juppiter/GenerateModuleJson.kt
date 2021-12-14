@@ -24,12 +24,10 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.property
 
+@CacheableTask
 open class GenerateModuleJson : DefaultTask() {
 
   @Input
@@ -50,6 +48,12 @@ open class GenerateModuleJson : DefaultTask() {
     val mapper = ObjectMapper(factory)
       .registerKotlinModule()
       .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
-    mapper.writeValue(outputDirectory.file(fileName).get().asFile, moduleConfiguration.get())
+
+    // generate the output data
+    val moduleConfiguration = moduleConfiguration.get()
+    moduleConfiguration.resolveRepositories(project)
+
+    // write the output file
+    mapper.writeValue(outputDirectory.file(fileName).get().asFile, moduleConfiguration)
   }
 }
