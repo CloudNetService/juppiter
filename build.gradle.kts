@@ -19,7 +19,7 @@ plugins {
   `maven-publish`
   `java-gradle-plugin`
   id("org.cadixdev.licenser") version "0.6.1"
-  id("com.gradle.plugin-publish") version "0.15.0"
+  id("com.gradle.plugin-publish") version "0.18.0"
 }
 
 version = "0.1.2"
@@ -44,7 +44,7 @@ java {
 }
 
 dependencies {
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4") {
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0") {
     exclude(group = "org.jetbrains.kotlin")
   }
 }
