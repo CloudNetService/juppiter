@@ -44,7 +44,7 @@ java {
 }
 
 dependencies {
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0") {
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1") {
     exclude(group = "org.jetbrains.kotlin")
   }
 }
