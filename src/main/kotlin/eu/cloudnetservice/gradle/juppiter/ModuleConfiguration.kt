@@ -112,6 +112,10 @@ open class ModuleConfiguration(project: Project) {
     var repo: String? = null
 
     @Input
+    @Optional
+    var checksum: String? = null
+
+    @Input
     @JsonIgnore
     var needsRepoResolve: Boolean = true
   }

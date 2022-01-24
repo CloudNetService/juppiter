@@ -19,10 +19,10 @@ plugins {
   `maven-publish`
   `java-gradle-plugin`
   id("org.cadixdev.licenser") version "0.6.1"
-  id("com.gradle.plugin-publish") version "0.18.0"
+  id("com.gradle.plugin-publish") version "0.20.0"
 }
 
-version = "0.2.0"
+version = "0.3.0"
 group = "eu.cloudnetservice.gradle"
 
 // we set the kotlin jmvTarget specifically to 1.8 to prevent issues in case the default values changes
