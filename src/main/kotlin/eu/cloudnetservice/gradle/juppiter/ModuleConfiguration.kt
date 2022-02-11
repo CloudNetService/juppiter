@@ -40,7 +40,7 @@ open class ModuleConfiguration(project: Project) {
   // in version 7.4 but might be useful in the future too
   // https://github.com/gradle/gradle/issues/19848
   @JsonIgnore
-  private var resolved: AtomicBoolean = AtomicBoolean()
+  private val resolved: AtomicBoolean = AtomicBoolean()
 
   @Input
   var runtimeModule = false
