@@ -31,8 +31,16 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
+import java.util.concurrent.atomic.AtomicBoolean
 
 open class ModuleConfiguration(project: Project) {
+
+  // internal marker to prevent duplicate resolving of dependencies
+  // this was introduced initially because of a gradle issue introduces
+  // in version 7.4 but might be useful in the future too
+  // https://github.com/gradle/gradle/issues/19848
+  @JsonIgnore
+  private var resolved: AtomicBoolean = AtomicBoolean()
 
   @Input
   var runtimeModule = false
@@ -121,31 +129,33 @@ open class ModuleConfiguration(project: Project) {
   }
 
   fun setDefaults(project: Project, libraries: Configuration, moduleDependencies: Configuration) {
-    name = name ?: project.name
-    group = group ?: project.group.toString()
-    version = version ?: project.version.toString()
+    if (!this.resolved.getAndSet(true)) {
+      name = name ?: project.name
+      group = group ?: project.group.toString()
+      version = version ?: project.version.toString()
 
-    // other stuff
-    author = author ?: "Anonymous"
-    website = website ?: "https://cloudnetservice.eu"
-    description = description ?: project.description ?: "Just another CloudNet3 module"
+      // other stuff
+      author = author ?: "Anonymous"
+      website = website ?: "https://cloudnetservice.eu"
+      description = description ?: project.description ?: "Just another CloudNet3 module"
 
-    // dependencies of the module we need to resolve
-    libraries.resolvedConfiguration.resolvedArtifacts.forEach {
-      dependencies.add(DependencyUtils.convertToDependency(it, it.moduleVersion.id))
-    }
-
-    // dependencies of the module that are other modules, so we only need: group, name, version
-    moduleDependencies.resolvedConfiguration.firstLevelModuleDependencies
-      .map { it.module.id }
-      .forEach {
-        val dependency = Dependency(it.name)
-        dependency.group = it.group
-        dependency.version = it.version
-        dependency.needsRepoResolve = false
-
-        dependencies.add(dependency)
+      // dependencies of the module we need to resolve
+      libraries.resolvedConfiguration.resolvedArtifacts.forEach {
+        dependencies.add(DependencyUtils.convertToDependency(it, it.moduleVersion.id))
       }
+
+      // dependencies of the module that are other modules, so we only need: group, name, version
+      moduleDependencies.resolvedConfiguration.firstLevelModuleDependencies
+        .map { it.module.id }
+        .forEach {
+          val dependency = Dependency(it.name)
+          dependency.group = it.group
+          dependency.version = it.version
+          dependency.needsRepoResolve = false
+
+          dependencies.add(dependency)
+        }
+    }
   }
 
   fun resolveRepositories(project: Project) {
