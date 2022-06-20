@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 CloudNetService team & contributors
+ * Copyright 2022 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ plugins {
   `maven-publish`
   `java-gradle-plugin`
   id("org.cadixdev.licenser") version "0.6.1"
-  id("com.gradle.plugin-publish") version "0.20.0"
+  id("com.gradle.plugin-publish") version "1.0.0-rc-3"
 }
 
 version = "0.3.1"
@@ -44,7 +44,7 @@ java {
 }
 
 dependencies {
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1") {
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3") {
     exclude(group = "org.jetbrains.kotlin")
   }
 }
