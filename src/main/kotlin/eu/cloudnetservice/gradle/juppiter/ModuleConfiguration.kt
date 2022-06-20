@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 CloudNetService team & contributors
+ * Copyright 2022 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ open class ModuleConfiguration(project: Project) {
       // other stuff
       author = author ?: "Anonymous"
       website = website ?: "https://cloudnetservice.eu"
-      description = description ?: project.description ?: "Just another CloudNet3 module"
+      description = description ?: project.description ?: "Just another CloudNet module"
 
       // dependencies of the module we need to resolve
       libraries.resolvedConfiguration.resolvedArtifacts.forEach {
