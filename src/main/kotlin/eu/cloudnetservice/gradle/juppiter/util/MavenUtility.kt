@@ -34,8 +34,9 @@ object MavenUtility {
       )
       with(url.openConnection() as HttpURLConnection) {
         useCaches = false
-        readTimeout = 5000
-        connectTimeout = 5000
+        readTimeout = 30000
+        connectTimeout = 30000
+        instanceFollowRedirects = true
 
         setRequestProperty(
           "User-Agent",
