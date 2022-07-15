@@ -19,7 +19,7 @@ plugins {
   `maven-publish`
   `java-gradle-plugin`
   id("org.cadixdev.licenser") version "0.6.1"
-  id("com.gradle.plugin-publish") version "1.0.0-rc-3"
+  id("com.gradle.plugin-publish") version "1.0.0"
 }
 
 version = "0.3.2"
