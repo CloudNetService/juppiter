@@ -18,7 +18,7 @@ plugins {
   `kotlin-dsl`
   `maven-publish`
   `java-gradle-plugin`
-  id("org.cadixdev.licenser") version "0.6.1"
+  id("com.diffplug.spotless") version "6.11.0"
   id("com.gradle.plugin-publish") version "1.0.0"
 }
 
@@ -44,7 +44,7 @@ java {
 }
 
 dependencies {
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3") {
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.4") {
     exclude(group = "org.jetbrains.kotlin")
   }
 }
@@ -75,7 +75,8 @@ publishing {
   }
 }
 
-license {
-  include("**/*.kt")
-  header(project.file("LICENSE_HEADER"))
+spotless {
+  kotlin {
+    licenseHeaderFile(file("LICENSE_HEADER"))
+  }
 }
