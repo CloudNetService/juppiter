@@ -27,13 +27,15 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import java.util.concurrent.atomic.AtomicBoolean
 
-open class ModuleConfiguration(project: Project) {
+open class ModuleConfiguration(objectFactory: ObjectFactory) {
 
   // internal marker to prevent duplicate resolving of dependencies
   // this was introduced initially because of a gradle issue introduces
@@ -89,11 +91,11 @@ open class ModuleConfiguration(project: Project) {
 
   @Nested
   @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = JsonTypeInfo.As.WRAPPER_OBJECT)
-  val repositories: NamedDomainObjectContainer<Repository> = project.container(Repository::class.java)
+  val repositories: NamedDomainObjectContainer<Repository> = objectFactory.domainObjectContainer(Repository::class.java)
 
   @Nested
   @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = JsonTypeInfo.As.WRAPPER_OBJECT)
-  val dependencies: NamedDomainObjectContainer<Dependency> = project.container(Dependency::class.java)
+  val dependencies: NamedDomainObjectContainer<Dependency> = objectFactory.domainObjectContainer(Dependency::class.java)
 
   // for groovy
   fun repositories(closure: Closure<Unit>) = repositories.configure(closure)
@@ -158,8 +160,8 @@ open class ModuleConfiguration(project: Project) {
     }
   }
 
-  fun resolveRepositories(project: Project) {
-    val repos = project.repositories.filterIsInstance<MavenArtifactRepository>()
+  fun resolveRepositories(repositoryHandler: RepositoryHandler) {
+    val repos = repositoryHandler.filterIsInstance<MavenArtifactRepository>()
     // get the repos for the dependencies, throw an exception if we cannot resolve a dependency
     dependencies
       .filter { it.needsRepoResolve }
