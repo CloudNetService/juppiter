@@ -16,31 +16,10 @@
 
 package eu.cloudnetservice.gradle.juppiter.util
 
-import eu.cloudnetservice.gradle.juppiter.ModuleConfiguration
-import org.gradle.api.artifacts.ModuleVersionIdentifier
-import org.gradle.api.artifacts.ResolvedArtifact
-import org.gradle.api.internal.artifacts.repositories.resolver.MavenUniqueSnapshotComponentIdentifier
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-
-object DependencyUtils {
-
-  fun convertToDependency(art: ResolvedArtifact, id: ModuleVersionIdentifier): ModuleConfiguration.Dependency {
-    var version = id.version
-    if (id.version.endsWith("-SNAPSHOT") && art.id.componentIdentifier is MavenUniqueSnapshotComponentIdentifier) {
-      version = (art.id.componentIdentifier as MavenUniqueSnapshotComponentIdentifier).timestampedVersion
-    }
-
-    val dependency = ModuleConfiguration.Dependency(id.name)
-    dependency.group = id.group
-    dependency.version = version
-    dependency.checksum = ChecksumHelper.fileShaSum(art.file)
-
-    return dependency
-  }
-}
 
 // copied from the CloudNet-Updater to keep consistent when generating checksums
 object ChecksumHelper {

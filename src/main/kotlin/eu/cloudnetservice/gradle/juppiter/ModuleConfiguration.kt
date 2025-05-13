@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import eu.cloudnetservice.gradle.juppiter.jackson.JavaVersionSerializer
-import eu.cloudnetservice.gradle.juppiter.util.DependencyUtils
+import eu.cloudnetservice.gradle.juppiter.util.ChecksumHelper
 import eu.cloudnetservice.gradle.juppiter.util.MavenUtility
 import groovy.lang.Closure
 import org.gradle.api.JavaVersion
@@ -29,8 +29,10 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.internal.artifacts.repositories.resolver.MavenUniqueSnapshotComponentIdentifier
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import java.util.concurrent.atomic.AtomicBoolean
@@ -125,6 +127,14 @@ open class ModuleConfiguration(objectFactory: ObjectFactory) {
     @Optional
     var checksum: String? = null
 
+    @Internal
+    @JsonIgnore
+    var classifier: String? = null
+
+    @Internal
+    @JsonIgnore
+    var timestampedVersion: String? = null
+
     @Input
     @JsonIgnore
     var needsRepoResolve: Boolean = true
@@ -143,7 +153,19 @@ open class ModuleConfiguration(objectFactory: ObjectFactory) {
 
       // dependencies of the module we need to resolve
       libraries.resolvedConfiguration.resolvedArtifacts.forEach {
-        dependencies.add(DependencyUtils.convertToDependency(it, it.moduleVersion.id))
+        val versionId = it.moduleVersion.id
+        val dependency = Dependency(it.name)
+        dependency.group = versionId.group
+        dependency.version = versionId.version
+        dependency.classifier = it.classifier
+        dependency.checksum = ChecksumHelper.fileShaSum(it.file)
+
+        val componentIdentifier = it.id.componentIdentifier
+        if (versionId.version.endsWith("-SNAPSHOT") && componentIdentifier is MavenUniqueSnapshotComponentIdentifier) {
+          dependency.timestampedVersion = componentIdentifier.timestampedVersion
+        }
+
+        dependencies.add(dependency)
       }
 
       // dependencies of the module that are other modules, so we only need: group, name, version
@@ -166,14 +188,8 @@ open class ModuleConfiguration(objectFactory: ObjectFactory) {
     dependencies
       .filter { it.needsRepoResolve }
       .forEach {
-        val repo = MavenUtility.resolveRepository(it, repos) ?: throw UnknownDependencyException(it)
-        // set the repository of the dependency
-        it.repo = repo.name
-        // convert the repo
-        val repository = Repository(repo.name)
-        repository.url = repo.url.toURL().toExternalForm()
-        // register the repo
-        repositories.add(repository)
+        val repo = MavenUtility.findRepository(it, repos) ?: return@forEach
+        repositories.add(repo)
       }
   }
 
