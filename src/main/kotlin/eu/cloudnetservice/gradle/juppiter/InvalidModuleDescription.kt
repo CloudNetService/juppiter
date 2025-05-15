@@ -16,4 +16,6 @@
 
 package eu.cloudnetservice.gradle.juppiter
 
-class InvalidModuleDescription(message: String) : Exception("Invalid module configuration: $message")
+class InvalidModuleDescription(
+  message: String,
+) : Exception("Invalid module configuration: $message")

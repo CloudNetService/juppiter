@@ -20,12 +20,15 @@ import org.gradle.api.plugins.ExtensionContainer
 import kotlin.reflect.KClass
 
 object GradleUtil {
-
-  fun <E : Any> findOrAddExtension(extensions: ExtensionContainer, name: String, type: KClass<E>, factory: () -> E): E {
-    return extensions.findByType(type.java) ?: run {
+  fun <E : Any> findOrAddExtension(
+    extensions: ExtensionContainer,
+    name: String,
+    type: KClass<E>,
+    factory: () -> E,
+  ): E =
+    extensions.findByType(type.java) ?: run {
       val extension = factory.invoke()
       extensions.add(name, extension)
       extension
     }
-  }
 }

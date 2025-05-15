@@ -16,5 +16,6 @@
 
 package eu.cloudnetservice.gradle.juppiter
 
-class UnknownDependencyException(dep: ModuleConfiguration.Dependency) :
-  Exception("Unable to resolve dependency ${dep.group}:${dep.name}:${dep.version}")
+class UnknownDependencyException(
+  dep: ModuleConfiguration.Dependency,
+) : Exception("Unable to resolve dependency ${dep.group}:${dep.name}:${dep.version}")

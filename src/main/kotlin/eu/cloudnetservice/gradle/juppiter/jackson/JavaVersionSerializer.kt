@@ -25,8 +25,11 @@ import org.gradle.api.JavaVersion
  * A json serializer which writes the major version of the given java version into the json object.
  */
 class JavaVersionSerializer : JsonSerializer<JavaVersion>() {
-
-  override fun serialize(value: JavaVersion?, generator: JsonGenerator, serializers: SerializerProvider) {
+  override fun serialize(
+    value: JavaVersion?,
+    generator: JsonGenerator,
+    serializers: SerializerProvider,
+  ) {
     generator.writeNumber(value?.ordinal?.plus(1) ?: 0)
   }
 }

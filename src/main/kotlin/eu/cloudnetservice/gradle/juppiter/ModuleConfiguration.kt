@@ -37,8 +37,10 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import java.util.concurrent.atomic.AtomicBoolean
 
-open class ModuleConfiguration(objectFactory: ObjectFactory) {
-
+@Suppress("unused")
+open class ModuleConfiguration(
+  objectFactory: ObjectFactory,
+) {
   // internal marker to prevent duplicate resolving of dependencies
   // this was introduced initially because of a gradle issue introduces
   // in version 7.4 but might be useful in the future too
@@ -101,14 +103,19 @@ open class ModuleConfiguration(objectFactory: ObjectFactory) {
 
   // for groovy
   fun repositories(closure: Closure<Unit>) = repositories.configure(closure)
+
   fun dependencies(closure: Closure<Unit>) = dependencies.configure(closure)
 
-  data class Repository(@Input val name: String) {
+  data class Repository(
+    @Input val name: String,
+  ) {
     @Input
     var url: String? = null
   }
 
-  data class Dependency(@Input val name: String) {
+  data class Dependency(
+    @Input val name: String,
+  ) {
     @Input
     var group: String? = null
 
@@ -140,7 +147,11 @@ open class ModuleConfiguration(objectFactory: ObjectFactory) {
     var needsRepoResolve: Boolean = true
   }
 
-  fun setDefaults(project: Project, libraries: Configuration, moduleDependencies: Configuration) {
+  fun setDefaults(
+    project: Project,
+    libraries: Configuration,
+    moduleDependencies: Configuration,
+  ) {
     if (!this.resolved.getAndSet(true)) {
       name = name ?: project.name
       group = group ?: project.group.toString()

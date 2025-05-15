@@ -25,12 +25,15 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 @CacheableTask
 abstract class GenerateModuleJson : DefaultTask() {
-
   @get:Inject
   abstract val repositoryHandler: RepositoryHandler
 
@@ -45,13 +48,15 @@ abstract class GenerateModuleJson : DefaultTask() {
 
   @TaskAction
   fun generate() {
-    val factory = JsonFactory()
-      .enable(JsonGenerator.Feature.IGNORE_UNKNOWN)
-      .enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION)
+    val factory =
+      JsonFactory()
+        .enable(JsonGenerator.Feature.IGNORE_UNKNOWN)
+        .enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION)
 
-    val mapper = ObjectMapper(factory)
-      .registerKotlinModule()
-      .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+    val mapper =
+      ObjectMapper(factory)
+        .registerKotlinModule()
+        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
 
     // generate the output data
     val moduleConfiguration = moduleConfiguration.get()
