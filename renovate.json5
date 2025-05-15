@@ -1,0 +1,36 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+  ],
+  "labels": [
+    "t: dependencies",
+  ],
+  "reviewers": [
+    "0utplay",
+    "derklaro",
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "github-actions",
+      ],
+      "groupName": "github actions",
+    },
+    {
+      "matchUpdateTypes": [
+        "patch",
+      ],
+      "matchPackageNames": [
+        "*",
+        "!gradle",
+      ],
+      "groupName": "all dependencies with patch changes",
+    },
+  ],
+  "prHourlyLimit": 10,
+  "rebaseWhen": "conflicted",
+  "rebaseLabel": "s: rebase",
+  "commitMessagePrefix": "chore: ",
+  "commitMessageAction": "update",
+}
