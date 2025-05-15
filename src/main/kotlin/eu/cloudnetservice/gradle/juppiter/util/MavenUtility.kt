@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2022 CloudNetService team & contributors
+ * Copyright 2019-2025 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object MavenUtility {
-
   fun findRepository(
     dependency: ModuleConfiguration.Dependency,
-    repositories: Iterable<MavenArtifactRepository>
+    repositories: Iterable<MavenArtifactRepository>,
   ): ModuleConfiguration.Repository? {
     repositories.forEach {
       val urlInRepository = resolveUrlInRepository(dependency, it) ?: return@forEach
@@ -49,19 +48,19 @@ object MavenUtility {
 
   private fun resolveUrlInRepository(
     dependency: ModuleConfiguration.Dependency,
-    repository: MavenArtifactRepository
+    repository: MavenArtifactRepository,
   ): URL? {
     val groupForUrl = dependency.group!!.replace(".", "/")
     val componentVersion = dependency.timestampedVersion ?: dependency.version
     val classifier = if (dependency.classifier != null) "-${dependency.classifier}" else ""
-    val componentName = "${dependency.name}-${componentVersion}${classifier}.jar"
-    val urlPath = "${groupForUrl}/${dependency.name}/${dependency.version}/${componentName}"
+    val componentName = "${dependency.name}-$componentVersion$classifier.jar"
+    val urlPath = "$groupForUrl/${dependency.name}/${dependency.version}/$componentName"
     val fullUrl = URL(repository.url.toURL(), urlPath)
     return if (resourceExists(fullUrl)) fullUrl else null
   }
 
-  private fun resourceExists(url: URL): Boolean {
-    return with(url.openConnection() as HttpURLConnection) {
+  private fun resourceExists(url: URL): Boolean =
+    with(url.openConnection() as HttpURLConnection) {
       useCaches = false
       connectTimeout = 5000
       requestMethod = "HEAD"
@@ -72,5 +71,4 @@ object MavenUtility {
 
       responseCode == 200
     }
-  }
 }

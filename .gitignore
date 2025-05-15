@@ -21,6 +21,9 @@
 .gradle/
 build/
 
+# fleet
+.fleet/
+
 # eclipse
 *.classpath
 *.project
@@ -66,3 +69,6 @@ atlassian-ide-plugin.xml
 
 # delombok
 */src/main/lombok
+
+# Kotlin
+.kotlin

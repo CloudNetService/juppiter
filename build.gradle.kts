@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2022 CloudNetService team & contributors
+ * Copyright 2021 - 2025 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,69 +14,64 @@
  * limitations under the License.
  */
 
+import java.nio.charset.StandardCharsets
+
 plugins {
   `kotlin-dsl`
   `maven-publish`
   `java-gradle-plugin`
-  id("com.diffplug.spotless") version "6.11.0"
-  id("com.gradle.plugin-publish") version "1.0.0"
+  id("com.diffplug.spotless") version "7.0.3"
+  id("org.jetbrains.kotlin.jvm") version "2.0.21"
+  id("com.gradle.plugin-publish") version "1.3.1"
 }
 
 version = "0.4.0"
 group = "eu.cloudnetservice.gradle"
-
-// we set the kotlin jmvTarget specifically to 1.8 to prevent issues in case the default values changes
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-compileKotlin.kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+description = "A Gradle plugin that generates the module.json for CloudNet modules based on the Gradle project"
 
 java {
+  withSourcesJar()
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(8))
+    vendor = JvmVendorSpec.AZUL
+    languageVersion = JavaLanguageVersion.of(8)
   }
 }
 
 repositories {
-  gradlePluginPortal()
-}
-
-java {
-  withSourcesJar()
+  mavenCentral()
 }
 
 dependencies {
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.4") {
+  implementation(gradleApi())
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.0") {
     exclude(group = "org.jetbrains.kotlin")
   }
 }
 
 gradlePlugin {
+  website = "https://cloudnetservice.eu"
+  vcsUrl = "https://github.com/CloudNetService/juppiter"
+
   plugins {
     register("juppiter") {
       description = project.description
       id = "eu.cloudnetservice.juppiter"
       displayName = "Juppiter Gradle Plugin"
+      tags = listOf("cloudnet", "cloudnet-module-util")
       implementationClass = "eu.cloudnetservice.gradle.juppiter.JuppiterPlugin"
     }
   }
 }
 
-pluginBundle {
-  description = project.description
-  website = "https://cloudnetservice.eu"
-  vcsUrl = "https://github.com/CloudNetService/juppiter"
-  tags = listOf("cloudnet", "cloudnet-module-util")
-}
-
-publishing {
-  publications {
-    register<MavenPublication>("mavenJava") {
-      from(components["java"])
-    }
-  }
-}
-
 spotless {
+  encoding = StandardCharsets.UTF_8
+  lineEndings = com.diffplug.spotless.LineEnding.UNIX
+
   kotlin {
-    licenseHeaderFile(file("LICENSE_HEADER"))
+    ktlint()
+    licenseHeaderFile(rootProject.file("LICENSE_HEADER"))
   }
 }

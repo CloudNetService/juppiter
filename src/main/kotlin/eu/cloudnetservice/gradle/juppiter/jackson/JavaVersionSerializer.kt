@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2022 CloudNetService team & contributors
+ * Copyright 2019-2025 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,11 @@ import org.gradle.api.JavaVersion
  * A json serializer which writes the major version of the given java version into the json object.
  */
 class JavaVersionSerializer : JsonSerializer<JavaVersion>() {
-
-  override fun serialize(value: JavaVersion?, generator: JsonGenerator, serializers: SerializerProvider) {
+  override fun serialize(
+    value: JavaVersion?,
+    generator: JsonGenerator,
+    serializers: SerializerProvider,
+  ) {
     generator.writeNumber(value?.ordinal?.plus(1) ?: 0)
   }
 }

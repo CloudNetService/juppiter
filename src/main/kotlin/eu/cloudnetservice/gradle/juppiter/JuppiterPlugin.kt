@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2022 CloudNetService team & contributors
+ * Copyright 2019-2025 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,28 +27,31 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 
 class JuppiterPlugin : Plugin<Project> {
-
   override fun apply(target: Project) {
     target.run {
       val libraries = configurations.maybeCreate("moduleLibrary")
       val moduleDependencies = configurations.maybeCreate("moduleDependency")
 
-      val moduleExtension = GradleUtil.findOrAddExtension(extensions, "moduleJson", ModuleConfiguration::class) {
-        ModuleConfiguration(target.objects)
-      }
-
-      val generateModuleTask = tasks.register<GenerateModuleJson>("genModuleJson") {
-        fileName.convention("module.json")
-        outputDirectory.convention(layout.buildDirectory.dir("generated/module-json"))
-        moduleConfiguration.convention(provider {
-          moduleExtension.setDefaults(this@run, libraries, moduleDependencies)
-          moduleExtension
-        })
-
-        doFirst {
-          moduleExtension.validate()
+      val moduleExtension =
+        GradleUtil.findOrAddExtension(extensions, "moduleJson", ModuleConfiguration::class) {
+          ModuleConfiguration(target.objects)
         }
-      }
+
+      val generateModuleTask =
+        tasks.register<GenerateModuleJson>("genModuleJson") {
+          fileName.convention("module.json")
+          outputDirectory.convention(layout.buildDirectory.dir("generated/module-json"))
+          moduleConfiguration.convention(
+            provider {
+              moduleExtension.setDefaults(this@run, libraries, moduleDependencies)
+              moduleExtension
+            },
+          )
+
+          doFirst {
+            moduleExtension.validate()
+          }
+        }
 
       plugins.withType<JavaPlugin> {
         extensions.getByType<SourceSetContainer>().named(SourceSet.MAIN_SOURCE_SET_NAME) {

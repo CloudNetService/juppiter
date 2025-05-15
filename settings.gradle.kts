@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2022 CloudNetService team & contributors
+ * Copyright 2021 - 2025 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,5 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention").version("0.10.0")
+}
 
 rootProject.name = "juppiter"

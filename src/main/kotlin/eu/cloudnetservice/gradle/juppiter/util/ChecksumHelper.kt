@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2022 CloudNetService team & contributors
+ * Copyright 2019-2025 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,12 @@ import java.security.NoSuchAlgorithmException
 
 // copied from the CloudNet-Updater to keep consistent when generating checksums
 object ChecksumHelper {
-
   @Throws(IOException::class)
-  fun fileShaSum(path: File): String {
-    return newSha3256Digest().run {
+  fun fileShaSum(path: File): String =
+    newSha3256Digest().run {
       update(path.readBytes())
       bytesToHex(digest())
     }
-  }
 
   @Throws(NoSuchAlgorithmException::class)
   private fun newSha3256Digest(): MessageDigest = MessageDigest.getInstance("SHA3-256")
