@@ -53,7 +53,7 @@ object MavenUtility {
     val groupForUrl = dependency.group!!.replace(".", "/")
     val componentVersion = dependency.timestampedVersion ?: dependency.version
     val classifier = if (dependency.classifier != null) "-${dependency.classifier}" else ""
-    val componentName = "${dependency.name}-${componentVersion}$classifier.jar"
+    val componentName = "${dependency.name}-$componentVersion$classifier.jar"
     val urlPath = "$groupForUrl/${dependency.name}/${dependency.version}/$componentName"
     val fullUrl = URL(repository.url.toURL(), urlPath)
     return if (resourceExists(fullUrl)) fullUrl else null
