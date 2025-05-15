@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2022 CloudNetService team & contributors
+ * Copyright 2019-2025 CloudNetService team & contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,7 +184,6 @@ open class ModuleConfiguration(objectFactory: ObjectFactory) {
 
   fun resolveRepositories(repositoryHandler: RepositoryHandler) {
     val repos = repositoryHandler.filterIsInstance<MavenArtifactRepository>()
-    // get the repos for the dependencies, throw an exception if we cannot resolve a dependency
     dependencies
       .filter { it.needsRepoResolve }
       .forEach {
