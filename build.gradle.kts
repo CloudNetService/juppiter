@@ -25,7 +25,7 @@ plugins {
   id("com.gradle.plugin-publish") version "1.3.1"
 }
 
-version = "0.4.0"
+version = "0.5.0-SNAPSHOT"
 group = "eu.cloudnetservice.gradle"
 description = "A Gradle plugin that generates the module.json for CloudNet modules based on the Gradle project"
 
