@@ -22,7 +22,6 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
@@ -30,13 +29,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import javax.inject.Inject
 
 @CacheableTask
 abstract class GenerateModuleJson : DefaultTask() {
-  @get:Inject
-  abstract val repositoryHandler: RepositoryHandler
-
   @get:Input
   abstract val fileName: Property<String>
 
@@ -60,7 +55,6 @@ abstract class GenerateModuleJson : DefaultTask() {
 
     // generate the output data
     val moduleConfiguration = moduleConfiguration.get()
-    moduleConfiguration.resolveRepositories(repositoryHandler)
 
     // write the output file
     mapper.writeValue(outputDirectory.file(fileName).get().asFile, moduleConfiguration)

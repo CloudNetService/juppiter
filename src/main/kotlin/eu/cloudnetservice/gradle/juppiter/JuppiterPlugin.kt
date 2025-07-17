@@ -44,6 +44,9 @@ class JuppiterPlugin : Plugin<Project> {
           moduleConfiguration.convention(
             provider {
               moduleExtension.setDefaults(this@run, libraries, moduleDependencies)
+
+              // This provider is lazy, so it should be applied after project configuration
+              moduleExtension.resolveRepositories(project.repositories)
               moduleExtension
             },
           )
