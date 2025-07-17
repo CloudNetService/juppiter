@@ -53,10 +53,7 @@ abstract class GenerateModuleJson : DefaultTask() {
         .registerKotlinModule()
         .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
 
-    // generate the output data
     val moduleConfiguration = moduleConfiguration.get()
-
-    // write the output file
     mapper.writeValue(outputDirectory.file(fileName).get().asFile, moduleConfiguration)
   }
 }
