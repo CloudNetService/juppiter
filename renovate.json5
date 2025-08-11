@@ -27,6 +27,13 @@
       ],
       "groupName": "all dependencies with patch changes",
     },
+    {
+      "description": "Dependencies whose updates shouldn't be done automatically",
+      matchPackageNames: [
+        "org.jetbrains.kotlin.jvm", // should be aligned with the version bundled in gradle
+      ],
+      enabled: false,
+    }
   ],
   "prHourlyLimit": 10,
   "rebaseWhen": "conflicted",
