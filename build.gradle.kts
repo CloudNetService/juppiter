@@ -20,8 +20,8 @@ plugins {
   `kotlin-dsl`
   `maven-publish`
   `java-gradle-plugin`
-  id("com.diffplug.spotless") version "7.1.0"
-  id("org.jetbrains.kotlin.jvm") version "2.0.21"
+  id("com.diffplug.spotless") version "7.2.1"
+  id("org.jetbrains.kotlin.jvm") version "2.2.0"
   id("com.gradle.plugin-publish") version "1.3.1"
 }
 
@@ -40,13 +40,9 @@ java {
   }
 }
 
-repositories {
-  mavenCentral()
-}
-
 dependencies {
   implementation(gradleApi())
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.1") {
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2") {
     exclude(group = "org.jetbrains.kotlin")
   }
 }
