@@ -29,10 +29,10 @@
     },
     {
       "description": "Dependencies whose updates shouldn't be done automatically",
-      matchPackageNames: [
-        "org.jetbrains.kotlin.jvm", // should be aligned with the version bundled in gradle
+      "matchPackageNames": [
+        "org.jetbrains.kotlin.jvm:**", // should be aligned with the version bundled in gradle
       ],
-      enabled: false,
+      "enabled": false,
     }
   ],
   "prHourlyLimit": 10,
