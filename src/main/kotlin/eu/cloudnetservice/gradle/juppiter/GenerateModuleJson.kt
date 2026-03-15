@@ -19,16 +19,18 @@ package eu.cloudnetservice.gradle.juppiter
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.StreamWriteConstraints
+import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import eu.cloudnetservice.gradle.juppiter.data.ModuleConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.*
 
 @CacheableTask
 abstract class GenerateModuleJson : DefaultTask() {
@@ -47,11 +49,28 @@ abstract class GenerateModuleJson : DefaultTask() {
       JsonFactory()
         .enable(JsonGenerator.Feature.IGNORE_UNKNOWN)
         .enable(JsonGenerator.Feature.STRICT_DUPLICATE_DETECTION)
+        .setStreamWriteConstraints(StreamWriteConstraints.builder().maxNestingDepth(2000).build())
 
+    val module = SimpleModule().apply {
+      addSerializer(Provider::class.java, object : JsonSerializer<Provider<*>>() {
+        override fun serialize(
+          value: Provider<*>,
+          gen: JsonGenerator,
+          serializers: SerializerProvider
+        ) {
+          if (value.isPresent) {
+            println(value.get())
+            gen.writeObject(value.get())
+          }
+          else gen.writeNull()
+        }
+      })
+    }
     val mapper =
       ObjectMapper(factory)
         .registerKotlinModule()
-        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+        .registerModule(module)
+        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY).writerWithDefaultPrettyPrinter()
 
     val moduleConfiguration = moduleConfiguration.get()
     mapper.writeValue(outputDirectory.file(fileName).get().asFile, moduleConfiguration)

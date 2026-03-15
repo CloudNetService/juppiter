@@ -16,59 +16,59 @@
 
 package eu.cloudnetservice.gradle.juppiter.util
 
-import eu.cloudnetservice.gradle.juppiter.ModuleConfiguration
-import eu.cloudnetservice.gradle.juppiter.UnknownDependencyException
+import eu.cloudnetservice.gradle.juppiter.data.ModuleConfiguration
+//import eu.cloudnetservice.gradle.juppiter.UnknownDependencyException
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import java.net.HttpURLConnection
 import java.net.URL
 
-object MavenUtility {
-  fun findRepository(
-    dependency: ModuleConfiguration.Dependency,
-    repositories: Iterable<MavenArtifactRepository>,
-  ): ModuleConfiguration.Repository? {
-    repositories.forEach {
-      val urlInRepository = resolveUrlInRepository(dependency, it) ?: return@forEach
-      if (dependency.timestampedVersion != null || dependency.classifier != null) {
-        // timestamped version and classifier are not supported by CloudNet module loading currently
-        // therefore, we need to hack around this limitation by providing the url directly
-        dependency.url = urlInRepository.toExternalForm()
-        return null
-      } else {
-        // CloudNet can download this dependency directly from the maven repository
-        val repository = ModuleConfiguration.Repository(it.name)
-        repository.url = it.url.toURL().toExternalForm()
-        dependency.repo = repository.name
-        return repository
-      }
-    }
-
-    throw UnknownDependencyException(dependency)
-  }
-
-  private fun resolveUrlInRepository(
-    dependency: ModuleConfiguration.Dependency,
-    repository: MavenArtifactRepository,
-  ): URL? {
-    val groupForUrl = dependency.group!!.replace(".", "/")
-    val componentVersion = dependency.timestampedVersion ?: dependency.version
-    val classifier = if (dependency.classifier != null) "-${dependency.classifier}" else ""
-    val componentName = "${dependency.name}-$componentVersion$classifier.jar"
-    val urlPath = "$groupForUrl/${dependency.name}/${dependency.version}/$componentName"
-    val fullUrl = URL(repository.url.toURL(), urlPath)
-    return if (resourceExists(fullUrl)) fullUrl else null
-  }
-
-  private fun resourceExists(url: URL): Boolean =
-    with(url.openConnection() as HttpURLConnection) {
-      useCaches = false
-      connectTimeout = 5000
-      requestMethod = "HEAD"
-      instanceFollowRedirects = true
-
-      setRequestProperty("User-Agent", "CloudNetService/juppiter Repository Resolve")
-      connect()
-
-      responseCode == 200
-    }
-}
+//object MavenUtility {
+//  fun findRepository(
+//    dependency: ModuleConfiguration.Dependency,
+//    repositories: Iterable<MavenArtifactRepository>,
+//  ): ModuleConfiguration.Repository? {
+//    repositories.forEach {
+//      val urlInRepository = resolveUrlInRepository(dependency, it) ?: return@forEach
+//      if (dependency.timestampedVersion != null || dependency.classifier != null) {
+//        // timestamped version and classifier are not supported by CloudNet module loading currently
+//        // therefore, we need to hack around this limitation by providing the url directly
+//        dependency.url = urlInRepository.toExternalForm()
+//        return null
+//      } else {
+//        // CloudNet can download this dependency directly from the maven repository
+//        val repository = ModuleConfiguration.Repository(it.name)
+//        repository.url = it.url.toURL().toExternalForm()
+//        dependency.repo = repository.name
+//        return repository
+//      }
+//    }
+//
+//    throw UnknownDependencyException(dependency)
+//  }
+//
+//  private fun resolveUrlInRepository(
+//    dependency: ModuleConfiguration.Dependency,
+//    repository: MavenArtifactRepository,
+//  ): URL? {
+//    val groupForUrl = dependency.group!!.replace(".", "/")
+//    val componentVersion = dependency.timestampedVersion ?: dependency.version
+//    val classifier = if (dependency.classifier != null) "-${dependency.classifier}" else ""
+//    val componentName = "${dependency.name}-$componentVersion$classifier.jar"
+//    val urlPath = "$groupForUrl/${dependency.name}/${dependency.version}/$componentName"
+//    val fullUrl = URL(repository.url.toURL(), urlPath)
+//    return if (resourceExists(fullUrl)) fullUrl else null
+//  }
+//
+//  private fun resourceExists(url: URL): Boolean =
+//    with(url.openConnection() as HttpURLConnection) {
+//      useCaches = false
+//      connectTimeout = 5000
+//      requestMethod = "HEAD"
+//      instanceFollowRedirects = true
+//
+//      setRequestProperty("User-Agent", "CloudNetService/juppiter Repository Resolve")
+//      connect()
+//
+//      responseCode == 200
+//    }
+//}

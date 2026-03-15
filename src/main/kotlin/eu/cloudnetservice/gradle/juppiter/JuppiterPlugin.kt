@@ -16,8 +16,8 @@
 
 package eu.cloudnetservice.gradle.juppiter
 
+import eu.cloudnetservice.gradle.juppiter.data.ModuleConfiguration
 import eu.cloudnetservice.gradle.juppiter.flavor.FlavorExtension
-import eu.cloudnetservice.gradle.juppiter.util.GradleUtil
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -30,33 +30,20 @@ import org.gradle.kotlin.dsl.withType
 class JuppiterPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     target.run {
-      val libraries = configurations.maybeCreate("moduleLibrary")
-      val moduleDependencies = configurations.maybeCreate("moduleDependency")
+      val libraries = configurations.register("moduleLibrary")
+      val moduleDependencies = configurations.register("moduleDependency")
 
-      val moduleExtension =
-        GradleUtil.findOrAddExtension(extensions, "moduleJson", ModuleConfiguration::class) {
-          ModuleConfiguration(target.objects)
-        }
+      val moduleExtension = ModuleConfiguration(target.objects)
+      extensions.add("moduleJson", moduleExtension)
+
       val flavorExtension = FlavorExtension(this)
       extensions.add("flavors", flavorExtension)
 
       val generateModuleTask =
         tasks.register<GenerateModuleJson>("genModuleJson") {
-          fileName.convention("module.json")
+          fileName.convention("cloudnet-module.json")
           outputDirectory.convention(layout.buildDirectory.dir("generated/module-json"))
-          moduleConfiguration.convention(
-            provider {
-              moduleExtension.setDefaults(this@run, libraries, moduleDependencies)
-
-              // This provider is lazy, so it should be applied after project configuration
-              moduleExtension.resolveRepositories(project.repositories)
-              moduleExtension
-            },
-          )
-
-          doFirst {
-            moduleExtension.validate()
-          }
+          moduleConfiguration.convention(moduleExtension)
         }
 
       plugins.withType<JavaPlugin> {

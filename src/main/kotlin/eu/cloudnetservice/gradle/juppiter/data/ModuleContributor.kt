@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cloudnetservice.gradle.juppiter
+package eu.cloudnetservice.gradle.juppiter.data
 
-import eu.cloudnetservice.gradle.juppiter.data.ModuleConfiguration
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
+import org.gradle.kotlin.dsl.mapProperty
+import org.gradle.kotlin.dsl.property
 
-//class UnknownDependencyException(
-//    dep: ModuleConfiguration.Dependency,
-//) : Exception("Unable to resolve dependency ${dep.group}:${dep.name}:${dep.version}")
+class ModuleContributor(objectFactory: ObjectFactory) {
+  @Input
+  val name: Property<String> = objectFactory.property()
+
+  @Input
+  val properties: MapProperty<String, Any> = objectFactory.mapProperty()
+}

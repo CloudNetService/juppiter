@@ -1,3 +1,5 @@
+import eu.cloudnetservice.gradle.juppiter.data.*
+
 /*
  * Copyright 2019-present CloudNetService team & contributors
  *
@@ -21,8 +23,42 @@ plugins {
 //  id("net.fabricmc.fabric-loom-remap") apply false
 }
 
+data class Cls(@Input val x: String)
+
 moduleJson {
-  main = "abc"
+  entrypoint = "abc"
+  id = "test"
+  name = "Test Module"
+  artifacts.add(ModuleArtifact(objects).apply {
+    this.source = ModuleArtifactSource.CLASSPATH
+    this.sourcePath = "test/source"
+    this.targetPath = "test/target"
+    this.environments.add("wrapper env ??")
+  })
+  artifacts.add(ModuleArtifact(objects).apply {
+    this.source = ModuleArtifactSource.FILESYSTEM
+    this.sourcePath = "test/source"
+    this.targetPath = "test/target"
+    this.environments.add("wrapper env ??")
+  })
+  dependencies.add(ModuleDependency(objects).apply {
+    this.id = "bridge"
+    this.versionRange = "69+"
+  })
+  externalDependencies.add(ModuleExternalDependency(objects).apply {
+    this.environments.add("* or sth")
+    this.loader = "was auch immer loader sein soll"
+    this.optional = true
+//    this.properties.put("test1", Cls("val1"))
+//    this.properties.put("test2", provider { Cls("val2") })
+  })
+  contributors.add(ModuleContributor(objects).apply {
+    this.name = "se big bad noob"
+    this.properties.put("test1", "val1")
+    this.properties.put("test2", provider { "val2" })
+  })
+  this.properties.put("test1", "val1")
+  this.properties.put("test2", provider { "val2" })
 }
 
 flavors {
@@ -51,6 +87,12 @@ repositories {
 
 dependencies {
 //  api("com.google.code.gson:gson:2.13.2")
-  "compileOnlyApi"("com.google.code.gson:gson:2.13.2")
+  "compileOnlyApi"("com.google.code.gson:gson:[2.13.0, 2.13.5]")
 //  "commonApi"("com.google.code.gson:gson:2.13.2")
+}
+
+configurations.compileOnlyApi.get().run {
+  this.dependencies.forEach {
+    println(it.version)
+  }
 }

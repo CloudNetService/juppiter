@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package eu.cloudnetservice.gradle.juppiter.util
+package eu.cloudnetservice.gradle.juppiter.data
 
-import org.gradle.api.plugins.ExtensionContainer
-import kotlin.reflect.KClass
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.kotlin.dsl.property
 
-object GradleUtil {
-  fun <E : Any> findOrAddExtension(
-    extensions: ExtensionContainer,
-    name: String,
-    type: KClass<E>,
-    factory: () -> E,
-  ): E =
-    extensions.findByType(type.java) ?: run {
-      val extension = factory.invoke()
-      extensions.add(name, extension)
-      extension
-    }
+class ModuleDependency(objectFactory: ObjectFactory) {
+  @Input
+  val id: Property<String> = objectFactory.property()
+  @Input
+  val versionRange: Property<String> = objectFactory.property()
+}
+
+enum class ModuleDependencyType {
+  REQUIRED,
+  SUGGESTED
 }
