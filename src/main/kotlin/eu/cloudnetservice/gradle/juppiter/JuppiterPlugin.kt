@@ -16,6 +16,7 @@
 
 package eu.cloudnetservice.gradle.juppiter
 
+import eu.cloudnetservice.gradle.juppiter.flavor.FlavorExtension
 import eu.cloudnetservice.gradle.juppiter.util.GradleUtil
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,6 +37,8 @@ class JuppiterPlugin : Plugin<Project> {
         GradleUtil.findOrAddExtension(extensions, "moduleJson", ModuleConfiguration::class) {
           ModuleConfiguration(target.objects)
         }
+      val flavorExtension = FlavorExtension(this)
+      extensions.add("flavors", flavorExtension)
 
       val generateModuleTask =
         tasks.register<GenerateModuleJson>("genModuleJson") {
