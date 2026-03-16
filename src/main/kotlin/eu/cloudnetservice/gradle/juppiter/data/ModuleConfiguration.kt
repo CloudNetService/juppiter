@@ -16,6 +16,7 @@
 
 package eu.cloudnetservice.gradle.juppiter.data
 
+import eu.cloudnetservice.gradle.juppiter.PropertyValueHolder
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -59,8 +60,10 @@ class ModuleConfiguration(
   @Nested
   val contributors: SetProperty<ModuleContributor> = objectFactory.setProperty()
 
-  @Input
-  val properties: MapProperty<String, Any> = objectFactory.mapProperty()
+  @Nested
+  val properties: MapProperty<String, PropertyValueHolder> = objectFactory.mapProperty()
+
+
 
 //  fun setDefaults(
 //    project: Project,

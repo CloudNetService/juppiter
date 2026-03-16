@@ -59,10 +59,16 @@ abstract class GenerateModuleJson : DefaultTask() {
           serializers: SerializerProvider
         ) {
           if (value.isPresent) {
-            println(value.get())
             gen.writeObject(value.get())
           }
           else gen.writeNull()
+        }
+      })
+      addSerializer(PropertyValueHolder::class.java, object : JsonSerializer<PropertyValueHolder>() {
+        override fun serialize(
+          value: PropertyValueHolder, gen: JsonGenerator, serializers: SerializerProvider
+        ) {
+          gen.writeObject(value.value)
         }
       })
     }

@@ -1,4 +1,6 @@
 import eu.cloudnetservice.gradle.juppiter.data.*
+import eu.cloudnetservice.gradle.juppiter.putComplex
+import eu.cloudnetservice.gradle.juppiter.putSimple
 
 /*
  * Copyright 2019-present CloudNetService team & contributors
@@ -49,16 +51,16 @@ moduleJson {
     this.environments.add("* or sth")
     this.loader = "was auch immer loader sein soll"
     this.optional = true
-//    this.properties.put("test1", Cls("val1"))
-//    this.properties.put("test2", provider { Cls("val2") })
+    this.properties.putComplex("test1", Cls("val1"))
+    this.properties.putComplex("test2", provider { Cls("val2") })
   })
   contributors.add(ModuleContributor(objects).apply {
     this.name = "se big bad noob"
-    this.properties.put("test1", "val1")
-    this.properties.put("test2", provider { "val2" })
+    this.properties.putSimple("test1", "val1")
+    this.properties.putSimple("test2", provider { "val2" })
   })
-  this.properties.put("test1", "val1")
-  this.properties.put("test2", provider { "val2" })
+  this.properties.putSimple("test1", "val1")
+  this.properties.putSimple("test2", provider { "val2" })
 }
 
 flavors {
