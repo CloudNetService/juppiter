@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import eu.cloudnetservice.gradle.juppiter.data.ModuleDependencyType
+import eu.cloudnetservice.gradle.juppiter.util.ChecksumHelper
 import eu.cloudnetservice.gradle.juppiter.util.ExtractModuleDependencyInformation
 import eu.cloudnetservice.gradle.juppiter.util.UnknownDependencyException
 import org.gradle.api.DefaultTask
@@ -79,6 +80,7 @@ abstract class PrepareModuleJson : DefaultTask() {
           dep.classifier?.let { properties["classifier"] = it }
           properties["repository"] = repository
           properties["url"] = depUrl.toString()
+          properties["checksum"] = "sha3256:${ChecksumHelper.sha3256(dep.file)}"
           return@map ResolvedExternalDependency("maven", dep.optional, dep.environments, properties)
         }
         throw UnknownDependencyException("Failed to resolve $dep")
