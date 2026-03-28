@@ -16,59 +16,105 @@
 
 package eu.cloudnetservice.gradle.juppiter.util
 
-import eu.cloudnetservice.gradle.juppiter.ModuleConfiguration
-import eu.cloudnetservice.gradle.juppiter.UnknownDependencyException
+import eu.cloudnetservice.gradle.juppiter.data.ModuleConfiguration
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.internal.artifacts.repositories.resolver.MavenUniqueSnapshotComponentIdentifier
 import java.net.HttpURLConnection
 import java.net.URL
 
-object MavenUtility {
-  fun findRepository(
-    dependency: ModuleConfiguration.Dependency,
-    repositories: Iterable<MavenArtifactRepository>,
-  ): ModuleConfiguration.Repository? {
-    repositories.forEach {
-      val urlInRepository = resolveUrlInRepository(dependency, it) ?: return@forEach
-      if (dependency.timestampedVersion != null || dependency.classifier != null) {
-        // timestamped version and classifier are not supported by CloudNet module loading currently
-        // therefore, we need to hack around this limitation by providing the url directly
-        dependency.url = urlInRepository.toExternalForm()
-        return null
-      } else {
-        // CloudNet can download this dependency directly from the maven repository
-        val repository = ModuleConfiguration.Repository(it.name)
-        repository.url = it.url.toURL().toExternalForm()
-        dependency.repo = repository.name
-        return repository
-      }
-    }
+data class MavenDependency(val group: String, val name: String, val version: String, val repositoryName: String)
 
-    throw UnknownDependencyException(dependency)
-  }
+data class MavenRepository(val url: String)
 
-  private fun resolveUrlInRepository(
-    dependency: ModuleConfiguration.Dependency,
-    repository: MavenArtifactRepository,
-  ): URL? {
-    val groupForUrl = dependency.group!!.replace(".", "/")
-    val componentVersion = dependency.timestampedVersion ?: dependency.version
-    val classifier = if (dependency.classifier != null) "-${dependency.classifier}" else ""
-    val componentName = "${dependency.name}-$componentVersion$classifier.jar"
-    val urlPath = "$groupForUrl/${dependency.name}/${dependency.version}/$componentName"
-    val fullUrl = URL(repository.url.toURL(), urlPath)
-    return if (resourceExists(fullUrl)) fullUrl else null
-  }
+//object MavenUtility {
+//    fun findRepository(
+//        dependency: MavenDependency,
+//        repositories: Iterable<MavenArtifactRepository>,
+//    ): MavenRepository? {
+//        repositories.forEach {
+//            val urlInRepository = resolveUrlInRepository(dependency, it) ?: return@forEach
+//            if (dependency.timestampedVersion != null || dependency.classifier != null) {
+//                // timestamped version and classifier are not supported by CloudNet module loading currently
+//                // therefore, we need to hack around this limitation by providing the url directly
+//                dependency.url = urlInRepository.toExternalForm()
+//                return null
+//            } else {
+//                // CloudNet can download this dependency directly from the maven repository
+//                val repository = ModuleConfiguration.Repository(it.name)
+//                repository.url = it.url.toURL().toExternalForm()
+//                dependency.repo = repository.name
+//                return repository
+//            }
+//        }
+//
+//        throw UnknownDependencyException(dependency)
+//    }
+//
+//    private fun resolveUrlInRepository(
+//        dependency: MavenDependency,
+//        repository: MavenArtifactRepository,
+//    ): URL? {
+//        val groupForUrl = dependency.group!!.replace(".", "/")
+//        val componentVersion = dependency.timestampedVersion ?: dependency.version
+//        val classifier = if (dependency.classifier != null) "-${dependency.classifier}" else ""
+//        val componentName = "${dependency.name}-$componentVersion$classifier.jar"
+//        val urlPath = "$groupForUrl/${dependency.name}/${dependency.version}/$componentName"
+//        val fullUrl = URL(repository.url.toURL(), urlPath)
+//        return if (resourceExists(fullUrl)) fullUrl else null
+//    }
+//
+//    private fun resourceExists(url: URL): Boolean =
+//        with(url.openConnection() as HttpURLConnection) {
+//            useCaches = false
+//            connectTimeout = 5000
+//            requestMethod = "HEAD"
+//            instanceFollowRedirects = true
+//
+//            setRequestProperty("User-Agent", "CloudNetService/juppiter Repository Resolve")
+//            connect()
+//
+//            responseCode == 200
+//        }
+//}
 
-  private fun resourceExists(url: URL): Boolean =
-    with(url.openConnection() as HttpURLConnection) {
-      useCaches = false
-      connectTimeout = 5000
-      requestMethod = "HEAD"
-      instanceFollowRedirects = true
-
-      setRequestProperty("User-Agent", "CloudNetService/juppiter Repository Resolve")
-      connect()
-
-      responseCode == 200
-    }
+fun test() {
+//  if (!this.resolved.getAndSet(true)) {
+//    name = name ?: project.name
+//    group = group ?: project.group.toString()
+//    version = version ?: project.version.toString()
+//
+//    // other stuff
+//    author = author ?: "Anonymous"
+//    website = website ?: "https://cloudnetservice.eu"
+//    description = description ?: project.description ?: "Just another CloudNet module"
+//
+//    // dependencies of the module we need to resolve
+//    libraries.resolvedConfiguration.resolvedArtifacts.forEach {
+//      val versionId = it.moduleVersion.id
+//      val dependency = Dependency(it.name)
+//      dependency.group = versionId.group
+//      dependency.version = versionId.version
+//      dependency.classifier = it.classifier
+//      dependency.checksum = ChecksumHelper.fileShaSum(it.file)
+//
+//      val componentIdentifier = it.id.componentIdentifier
+//      if (versionId.version.endsWith("-SNAPSHOT") && componentIdentifier is MavenUniqueSnapshotComponentIdentifier) {
+//        dependency.timestampedVersion = componentIdentifier.timestampedVersion
+//      }
+//
+//      dependencies.add(dependency)
+//    }
+//
+//    // dependencies of the module that are other modules, so we only need: group, name, version
+//    moduleDependencies.resolvedConfiguration.firstLevelModuleDependencies
+//      .map { it.module.id }
+//      .forEach {
+//        val dependency = Dependency(it.name)
+//        dependency.group = it.group
+//        dependency.version = it.version
+//        dependency.needsRepoResolve = false
+//
+//        dependencies.add(dependency)
+//      }
+//  }
 }

@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package eu.cloudnetservice.gradle.juppiter
+pluginManagement {
+  includeBuild("..")
 
-class UnknownDependencyException(
-  dep: ModuleConfiguration.Dependency,
-) : Exception("Unable to resolve dependency ${dep.group}:${dep.name}:${dep.version}")
+  repositories {
+    maven("https://maven.fabricmc.net/") {
+      name = "Fabric"
+    }
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}

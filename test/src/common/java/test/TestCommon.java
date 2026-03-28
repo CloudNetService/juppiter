@@ -14,21 +14,8 @@
  * limitations under the License.
  */
 
-package eu.cloudnetservice.gradle.juppiter.util
+package test;
 
-import org.gradle.api.plugins.ExtensionContainer
-import kotlin.reflect.KClass
+public class TestCommon  {
 
-object GradleUtil {
-  fun <E : Any> findOrAddExtension(
-    extensions: ExtensionContainer,
-    name: String,
-    type: KClass<E>,
-    factory: () -> E,
-  ): E =
-    extensions.findByType(type.java) ?: run {
-      val extension = factory.invoke()
-      extensions.add(name, extension)
-      extension
-    }
 }

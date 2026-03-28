@@ -24,11 +24,12 @@ import java.security.NoSuchAlgorithmException
 // copied from the CloudNet-Updater to keep consistent when generating checksums
 object ChecksumHelper {
   @Throws(IOException::class)
-  fun fileShaSum(path: File): String =
-    newSha3256Digest().run {
-      update(path.readBytes())
-      bytesToHex(digest())
-    }
+  fun fileShaSum(path: File): String = sha3256(path)
+
+  fun sha3256(path: File): String = newSha3256Digest().run {
+    update(path.readBytes())
+    bytesToHex(digest())
+  }
 
   @Throws(NoSuchAlgorithmException::class)
   private fun newSha3256Digest(): MessageDigest = MessageDigest.getInstance("SHA3-256")
