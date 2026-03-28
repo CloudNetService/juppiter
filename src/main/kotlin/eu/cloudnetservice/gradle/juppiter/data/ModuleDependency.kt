@@ -38,5 +38,6 @@ class ModuleDependency(objectFactory: ObjectFactory) {
 
 enum class ModuleDependencyType {
   REQUIRED,
-  SUGGESTED
+  SUGGESTED,
+  OPTIONAL
 }

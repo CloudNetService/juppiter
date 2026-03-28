@@ -105,9 +105,12 @@ dependencies {
 //    this.isTransitive = false
 //  }
   moduleLibrary("com.google.guava:guava:33.5.0-jre")
+  moduleLibrary("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 //  moduleLibrary("io.papermc.paper:paper-api:1.21.11-R0.1-20260310.030221-86:javadoc")
 //  "commonApi"("com.google.code.gson:gson:2.13.2")
 }
+
+val a = true
 
 val c2 = configurations.resolvable("abc") {
   this.extendsFrom(configurations.compileOnly)

@@ -19,8 +19,8 @@ package eu.cloudnetservice.gradle.juppiter
 import eu.cloudnetservice.gradle.juppiter.data.*
 import eu.cloudnetservice.gradle.juppiter.flavor.FlavorExtension
 import eu.cloudnetservice.gradle.juppiter.tasks.GenerateModuleJson
+import eu.cloudnetservice.gradle.juppiter.tasks.PrepareModuleJson
 import eu.cloudnetservice.gradle.juppiter.util.ChecksumHelper
-import eu.cloudnetservice.gradle.juppiter.util.ExtractModuleDependencyInformation
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
@@ -28,12 +28,14 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import java.io.File
 
 class JuppiterPlugin : Plugin<Project> {
   fun ConfigurationContainer.declarable(name: String) = declarable(name) {}
@@ -73,7 +75,9 @@ class JuppiterPlugin : Plugin<Project> {
           name,
           version,
           classifier,
-          checksum
+          checksum,
+          snapshot,
+          file
         )
       )
       if (!snapshot) {
@@ -87,6 +91,7 @@ class JuppiterPlugin : Plugin<Project> {
 
   override fun apply(target: Project) {
     target.run {
+      val objects = objects
       val libraries = configurations.declarable("moduleLibrary")
       val moduleDependencies = configurations.declarable("moduleDependency")
       val librariesOnly = configurations.declarable("moduleLibraryOnly") {
@@ -109,103 +114,79 @@ class JuppiterPlugin : Plugin<Project> {
       val flavorExtension = FlavorExtension(this)
       extensions.add("flavors", flavorExtension)
 
+      val prepareModuleJsonTask = tasks.register<PrepareModuleJson>("prepareModule") {
+        moduleJson.convention { temporaryDir.resolve("prepared-module.json") }
+        repositories.convention(
+          target.repositories.filterIsInstance<MavenArtifactRepository>().map { it.url.toString() })
+
+        unresolvedModuleDependencies.convention(dependenciesOnlyClasspath.map { configuration ->
+          configuration.allDependencies.map { dependency ->
+            // We resolve a detached configuration with our single dependency.
+            val file = configurations.detachedConfiguration(dependency)
+              .also { it.isTransitive = false }.incoming.artifacts.resolvedArtifacts.map { set -> set.single() }
+              .map { it.file }.get()
+
+            val versionRange = dependency.version!!
+            val optional = false
+            val type = ModuleDependencyType.REQUIRED
+            PrepareModuleJson.UnresolvedModuleDependency(versionRange, optional, file, type)
+          }
+        })
+        unresolvedExternalDependencies.convention(librariesOnlyClasspath.map { configuration ->
+          configuration.allDependencies.flatMap { dependency ->
+
+            val configuration = configurations.detachedConfiguration(dependency)
+
+
+            val intermediates =
+              configuration.resolvedConfiguration.firstLevelModuleDependencies.single().let { collect(it) }
+            intermediates.map { e ->
+              PrepareModuleJson.UnresolvedExternalDependency(
+                e.snapshot,
+                e.group,
+                e.name,
+                e.version,
+                e.classifier,
+                e.environments,
+                e.optional,
+                e.file
+              )
+            }
+          }
+        })
+
+      }
       val generateModuleTask =
         tasks.register<GenerateModuleJson>("genModuleJson") {
+          dependsOn(prepareModuleJsonTask)
           outputFile.convention(
             layout.buildDirectory.dir("generated/module-json").map { it.file("cloudnet-module.json") })
           moduleConfiguration.convention(moduleExtension)
         }
 
-      moduleExtension.dependencies.addAll(dependenciesOnlyClasspath.map { configuration ->
-        configuration.allDependencies.map { dependency ->
-          ModuleDependency(objects).apply {
-            // We resolve a detached configuration with our single dependency.
-            val extracted = configurations.detachedConfiguration(dependency)
-              .also { it.isTransitive = false }.incoming.artifacts.resolvedArtifacts.map { set -> set.single() }
-              .map { result -> ExtractModuleDependencyInformation.extract(result.file) }
-
-            id.convention(extracted.map { it.id })
-            versionRange.convention(dependency.version)
-            dependencyType.convention(ModuleDependencyType.REQUIRED)
-          }
-        }
-      })
-
-      moduleExtension.externalDependencies.addAll(librariesOnlyClasspath.map { configuration ->
-        configuration.allDependencies.flatMap { dependency ->
-
-          val configuration = configurations.detachedConfiguration(dependency)
-
-
-          val intermediates =
-            configuration.resolvedConfiguration.firstLevelModuleDependencies.single().let { collect(it) }
-          intermediates.map { e ->
-            ModuleExternalDependency(objects).apply {
-              this.loader.convention(e.loader)
-              this.optional.convention(e.optional)
-              this.environments.convention(e.environments)
-              this.properties.putSimple("group", e.group)
-              this.properties.putSimple("name", e.name)
-              this.properties.putSimple("version", e.version)
-              e.classifier?.also { this.properties.putSimple("classifier", it) }
-              e.checksum?.also { this.properties.putSimple("checksum", it) }
+      val prepared = prepareModuleJsonTask.flatMap { it.moduleJson }.map { it.asFile }
+        .map { it.readText() }.map { PrepareModuleJson.PreparedModuleJson.deserialize(it) }
+      moduleExtension.externalDependencies.addAll(prepared.map { prepared ->
+        prepared.externalDependencies.map { e ->
+          ModuleExternalDependency(objects).apply {
+            this.loader.convention(e.loader)
+            this.optional.convention(e.optional)
+            this.environments.convention(e.environments)
+            e.properties.forEach { (string, any) ->
+              this.properties.putSimple(string, any)
             }
           }
-//          if (isSnapshot(dependency)) {
-//            configuration.isTransitive = false
-//            configuration.resolvedConfiguration.firstLevelModuleDependencies.forEach { dep ->
-//              println(dep)
-//            }
-//            configuration.resolvedConfiguration.resolvedArtifacts.map { resolvedArtifact ->
-//              ModuleExternalDependency(objects).also { externalDependency ->
-//                externalDependency.loader.convention("maven")
-//                externalDependency.environments.convention(setOf("*"))
-//                externalDependency.optional.convention(false)
-//                externalDependency.properties.putSimple("group", resolvedArtifact.moduleVersion.id.group)
-//                externalDependency.properties.putSimple("name", resolvedArtifact.name)
-//                externalDependency.properties.putSimple("version", resolvedArtifact.moduleVersion.id.version)
-//                resolvedArtifact.classifier?.let { externalDependency.properties.putSimple("classifier", it) }
-//              }
-//            }
-//          } else {
-//            configuration.resolvedConfiguration.firstLevelModuleDependencies.forEach { dep ->
-//              println(dep)
-//              dep.moduleArtifacts.forEach { artifact ->
-//                println(artifact)
-//              }
-//              println(dep.children)
-//            }
-//            configuration.resolvedConfiguration.resolvedArtifacts.map { resolvedArtifact ->
-//              ModuleExternalDependency(objects).also { externalDependency ->
-//                externalDependency.loader.convention("maven")
-//                externalDependency.environments.convention(setOf("*"))
-//                externalDependency.optional.convention(false)
-//                externalDependency.properties.putSimple("group", resolvedArtifact.moduleVersion.id.group)
-//                externalDependency.properties.putSimple("name", resolvedArtifact.name)
-//                externalDependency.properties.putSimple("version", resolvedArtifact.moduleVersion.id.version)
-//                resolvedArtifact.classifier?.let { externalDependency.properties.putSimple("classifier", it) }
-//                externalDependency.properties.putSimple("checksum", ChecksumHelper.fileShaSum(resolvedArtifact.file))
-//              }
-//            }
-//          }
         }
       })
-
-
-//      afterEvaluate {
-//        libraries.map { it.allDependencies }.map {
-//          it.map {
-//            val c = configurations.detachedConfiguration(it)
-//            c.isCanBeResolved = true
-//            c.isCanBeConsumed = false
-//            c.isCanBeDeclared = false
-//
-//            c.resolvedConfiguration.firstLevelModuleDependencies.forEach {
-//              println(it)
-//            }
-//          }
-//        }.get()
-//      }
+      moduleExtension.dependencies.addAll(prepared.map { prepared ->
+        prepared.moduleDependencies.map { e ->
+          ModuleDependency(objects).apply {
+            this.id.convention(e.id)
+            this.versionRange.convention(e.versionRange)
+            this.dependencyType.convention(e.dependencyType)
+          }
+        }
+      })
 
       plugins.withType<JavaPlugin> {
         extensions.getByType<SourceSetContainer>().named(SourceSet.MAIN_SOURCE_SET_NAME) {
@@ -225,5 +206,7 @@ data class IntermediateExternalDependency(
   val name: String,
   val version: String,
   val classifier: String?,
-  val checksum: String?
+  val checksum: String?,
+  val snapshot: Boolean,
+  val file: File
 )
