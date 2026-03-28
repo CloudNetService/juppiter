@@ -16,7 +16,6 @@
 
 package eu.cloudnetservice.gradle.juppiter.data
 
-import eu.cloudnetservice.gradle.juppiter.PropertyValueHolder
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -31,4 +30,9 @@ class ModuleContributor(objectFactory: ObjectFactory) {
 
   @Nested
   val properties: MapProperty<String, PropertyValueHolder> = objectFactory.mapProperty()
+
+  init {
+    name.finalizeValueOnRead()
+    properties.finalizeValueOnRead()
+  }
 }

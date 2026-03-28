@@ -1,6 +1,4 @@
 import eu.cloudnetservice.gradle.juppiter.data.*
-import eu.cloudnetservice.gradle.juppiter.putComplex
-import eu.cloudnetservice.gradle.juppiter.putSimple
 
 /*
  * Copyright 2019-present CloudNetService team & contributors
@@ -43,17 +41,18 @@ moduleJson {
     this.targetPath = "test/target"
     this.environments.add("wrapper env ??")
   })
-  dependencies.add(ModuleDependency(objects).apply {
-    this.id = "bridge"
-    this.versionRange = "69+"
-  })
-  externalDependencies.add(ModuleExternalDependency(objects).apply {
-    this.environments.add("* or sth")
-    this.loader = "was auch immer loader sein soll"
-    this.optional = true
-    this.properties.putComplex("test1", Cls("val1"))
-    this.properties.putComplex("test2", provider { Cls("val2") })
-  })
+//  dependencies.add(ModuleDependency(objects).apply {
+//    this.id = "bridge"
+//    this.versionRange = "69+"
+//    this.dependencyType = ModuleDependencyType.REQUIRED
+//  })
+//  externalDependencies.add(ModuleExternalDependency(objects).apply {
+//    this.environments.add("* or sth")
+//    this.loader = "was auch immer loader sein soll"
+//    this.optional = true
+//    this.properties.putComplex("test1", Cls("val1"))
+//    this.properties.putComplex("test2", provider { Cls("val2") })
+//  })
   contributors.add(ModuleContributor(objects).apply {
     this.name = "se big bad noob"
     this.properties.putSimple("test1", "val1")
@@ -85,16 +84,41 @@ tasks.assemble {
 
 repositories {
   mavenCentral()
+  maven("https://central.sonatype.com/repository/maven-snapshots/")
+  maven {
+    name = "papermc"
+    url = uri("https://repo.papermc.io/repository/maven-public/")
+  }
+
+  maven("https://repository.derklaro.dev/releases/")
+  maven("https://repository.derklaro.dev/snapshots/")
 }
 
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+//java.disableAutoTargetJvm()
+
 dependencies {
+  "moduleDependency"("eu.cloudnetservice.cloudnet:bridge-impl:[4.0.0-RC14, 4.0.0-RC16]")
 //  api("com.google.code.gson:gson:2.13.2")
-  "compileOnlyApi"("com.google.code.gson:gson:[2.13.0, 2.13.5]")
+  moduleLibrary("com.google.code.gson:gson:[2.13.0, 2.13.5]")
+//  compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-20260109.190012-50") {
+//    this.isTransitive = false
+//  }
+  moduleLibrary("com.google.guava:guava:33.5.0-jre")
+//  moduleLibrary("io.papermc.paper:paper-api:1.21.11-R0.1-20260310.030221-86:javadoc")
 //  "commonApi"("com.google.code.gson:gson:2.13.2")
 }
 
-configurations.compileOnlyApi.get().run {
-  this.dependencies.forEach {
-    println(it.version)
-  }
+val c2 = configurations.resolvable("abc") {
+  this.extendsFrom(configurations.compileOnly)
 }
+//c2.get().run {
+//  this.allDependencies.forEach {
+//    println(it.version)
+//  }
+//  resolvedConfiguration.resolvedArtifacts.forEach {
+//    val version = it.moduleVersion.id.version
+//    println(version)
+//    println(it.id.componentIdentifier is MavenUniqueSnapshotComponentIdentifier)
+//  }
+//}

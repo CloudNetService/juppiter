@@ -35,6 +35,13 @@ class ModuleArtifact(objectFactory: ObjectFactory) {
 
   @Input
   val environments: SetProperty<String> = objectFactory.setProperty()
+
+  init {
+    source.finalizeValueOnRead()
+    sourcePath.finalizeValueOnRead()
+    targetPath.finalizeValueOnRead()
+    environments.finalizeValueOnRead()
+  }
 }
 
 enum class ModuleArtifactSource {

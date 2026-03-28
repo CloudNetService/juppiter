@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package eu.cloudnetservice.gradle.juppiter
+package eu.cloudnetservice.gradle.juppiter.util
 
-import eu.cloudnetservice.gradle.juppiter.data.ModuleConfiguration
-
-//class UnknownDependencyException(
-//    dep: ModuleConfiguration.Dependency,
-//) : Exception("Unable to resolve dependency ${dep.group}:${dep.name}:${dep.version}")
+class UnknownDependencyException(
+    dependencyIdentifier: String,
+) : Exception("Unable to resolve dependency $dependencyIdentifier")

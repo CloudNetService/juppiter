@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cloudnetservice.gradle.juppiter
+package eu.cloudnetservice.gradle.juppiter.data
 
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cloudnetservice.gradle.juppiter
+package eu.cloudnetservice.gradle.juppiter.tasks
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonFactory
@@ -26,22 +26,23 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import eu.cloudnetservice.gradle.juppiter.data.ModuleConfiguration
+import eu.cloudnetservice.gradle.juppiter.data.PropertyValueHolder
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
 @CacheableTask
 abstract class GenerateModuleJson : DefaultTask() {
-  @get:Input
-  abstract val fileName: Property<String>
-
   @get:Nested
   abstract val moduleConfiguration: Property<ModuleConfiguration>
 
-  @get:OutputDirectory
-  abstract val outputDirectory: DirectoryProperty
+  @get:OutputFile
+  abstract val outputFile: RegularFileProperty
 
   @TaskAction
   fun generate() {
@@ -79,6 +80,6 @@ abstract class GenerateModuleJson : DefaultTask() {
         .setSerializationInclusion(JsonInclude.Include.NON_EMPTY).writerWithDefaultPrettyPrinter()
 
     val moduleConfiguration = moduleConfiguration.get()
-    mapper.writeValue(outputDirectory.file(fileName).get().asFile, moduleConfiguration)
+    mapper.writeValue(outputFile.get().asFile, moduleConfiguration)
   }
 }

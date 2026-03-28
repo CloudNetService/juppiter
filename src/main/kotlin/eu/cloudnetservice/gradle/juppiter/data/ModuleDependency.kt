@@ -26,6 +26,14 @@ class ModuleDependency(objectFactory: ObjectFactory) {
   val id: Property<String> = objectFactory.property()
   @Input
   val versionRange: Property<String> = objectFactory.property()
+  @Input
+  val dependencyType: Property<ModuleDependencyType> = objectFactory.property()
+
+  init {
+    id.finalizeValueOnRead()
+    versionRange.finalizeValueOnRead()
+    dependencyType.finalizeValueOnRead()
+  }
 }
 
 enum class ModuleDependencyType {
