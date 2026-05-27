@@ -20,7 +20,7 @@ plugins {
   `kotlin-dsl`
   `maven-publish`
   `java-gradle-plugin`
-  id("com.diffplug.spotless") version "7.2.1"
+  id("com.diffplug.spotless") version "8.6.0"
   id("org.jetbrains.kotlin.jvm") version "2.2.0"
   id("com.gradle.plugin-publish") version "1.3.1"
 }
