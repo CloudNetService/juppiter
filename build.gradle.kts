@@ -42,7 +42,7 @@ java {
 
 dependencies {
   implementation(gradleApi())
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2") {
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.22.0") {
     exclude(group = "org.jetbrains.kotlin")
   }
 }
